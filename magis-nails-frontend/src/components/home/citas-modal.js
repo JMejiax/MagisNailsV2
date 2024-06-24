@@ -1,6 +1,6 @@
-// EventModal.js
 import React, { useEffect, useState } from 'react';
-import { Modal, Box, TextField, Typography, Button, Grid, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Modal, Box, TextField, Typography, Button, Grid, FormControl, InputLabel, Select, MenuItem, FormHelperText } from '@mui/material';
+import dayjs from 'dayjs';
 
 const modalStyle = {
     position: 'absolute',
@@ -16,11 +16,46 @@ const modalStyle = {
 };
 
 function EventModal({ open, handleClose, events, handleSave }) {
-    const [date, setDate] = useState(events[0].date);
+    const [date, setDate] = useState(dayjs(events[0].date).format('YYYY-MM-DD'));
     const [time, setTime] = useState('');
-    const [availableTime, setAvailableTime] = useState(['']);
+    const [availableTime, setAvailableTime] = useState([]);
+    const [errors, setErrors] = useState({ date: '', time: '' });
+
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+
+        if (name === 'time' && value !== '') {
+            setTime(value);
+            if (dayjs(date).format('YYYY-MM-DD') === dayjs(new Date()).format('YYYY-MM-DD')) {
+                if (value <= dayjs().format('HH:mm:ss')) {
+                    setErrors({ ...errors, time: 'La hora debe ser después de la hora actual.' });
+                } else {
+                    setErrors({ ...errors, time: '' });
+                }
+            } else {
+                setErrors({ ...errors, time: '' });
+            }
+        } else if (name === 'date') {
+            setDate(value);
+            if (value >= dayjs(new Date()).format('YYYY-MM-DD')) {
+                setErrors({ time: '', date: '' });
+            } else {
+                setErrors({ time: '', date: 'La fecha debe ser igual o después de la fecha de hoy.' });
+            }
+        }
+    }
 
     const handleSubmit = () => {
+        const newErrors = {
+            date: date < dayjs(new Date()).format('YYYY-MM-DD') ? 'La fecha debe ser igual o después de la fecha de hoy.' : '',
+            time: time ? '' : 'Este campo es requerido.',
+          };
+          setErrors(newErrors);
+      
+          if (Object.values(newErrors).some(error => error)) {
+            return;
+          }
+
         handleSave(date, time);
         handleClose();
     };
@@ -41,7 +76,6 @@ function EventModal({ open, handleClose, events, handleSave }) {
 
             if (response.ok) {
                 const timesResponse = await response.json();
-                // console.log(timesResponse.available_times)
                 setAvailableTime(timesResponse.available_times);
             } else if (response.status === 400) {
                 const errorResponse = await response.json();
@@ -56,7 +90,7 @@ function EventModal({ open, handleClose, events, handleSave }) {
 
     useEffect(() => {
         getTimes();
-    }, []);
+    }, [date]);
 
     return (
         <Modal open={open} onClose={handleClose}>
@@ -69,30 +103,32 @@ function EventModal({ open, handleClose, events, handleSave }) {
                         <TextField
                             label="Seleccione una Fecha"
                             type="date"
+                            name='date'
                             value={date}
-                            onChange={(e) => setDate(e.target.value)}
+                            onChange={handleChange}
                             fullWidth
+                            error={!!errors.date}
                             InputLabelProps={{ shrink: true }}
+                            helperText={errors.date}
                         />
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                        <FormControl fullWidth>
+                        <FormControl fullWidth error={!!errors.time}>
                             <InputLabel>Nueva Hora</InputLabel>
                             <Select
                                 label='Nueva Hora'
+                                name='time'
                                 value={time}
-                                onChange={(e) => setTime(e.target.value)}
+                                onChange={handleChange}
                                 displayEmpty
                             >
-                                {/* <MenuItem value="" disabled>
-                                    Seleccione la Hora
-                                </MenuItem> */}
                                 {availableTime.map((time) => (
                                     <MenuItem key={time} value={time}>
                                         {time}
                                     </MenuItem>
                                 ))}
                             </Select>
+                            {errors.time && <FormHelperText>{errors.time}</FormHelperText>}
                         </FormControl>
                     </Grid>
                 </Grid>

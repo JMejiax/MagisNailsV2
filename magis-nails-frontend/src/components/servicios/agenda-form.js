@@ -18,11 +18,14 @@ const Input = styled('input')({
 export default function AgendaForm() {
 
   const { userData } = React.useContext(AuthContext);
+
   const navigate = useNavigate();
   const [queryParameters] = useSearchParams();
   const selectedServiceId = queryParameters.get("id");
   const [availableTime, setAvailableTime] = useState([]);
   const [services, setServices] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(undefined);
   const [price, setPrice] = useState(0);
   const [loadingServices, setLoadingServices] = useState(false);
   const [loadingTimes, setLoadingTimes] = useState(false);
@@ -35,8 +38,10 @@ export default function AgendaForm() {
   });
 
   const [errors, setErrors] = useState({
+    user: '',
     selectedServices: '',
     paymentFile: '',
+    date: '',
   });
 
   const handleChange = (event) => {
@@ -52,16 +57,35 @@ export default function AgendaForm() {
     } else if (name === 'selectedServices' && value.length > 0) {
       setErrors({ ...errors, selectedServices: '' });
     } else if (name === 'time' && value !== '') {
-      setErrors({ ...errors, time: '' });
+      if (formValues.date.format('YYYY-MM-DD') === dayjs(new Date()).format('YYYY-MM-DD')) {
+        if (value <= dayjs().format('HH:mm:ss')) {
+          setErrors({ ...errors, time: 'La hora debe ser después de la hora actual.' });
+        } else {
+          setErrors({ ...errors, time: '' });
+        }
+      } else {
+        setErrors({ ...errors, time: '' });
+      }
+    } else if (name === 'date') {
+      if (value >= dayjs(new Date()).format('YYYY-MM-DD')) {
+        setFormValues({ ...formValues, date: dayjs(value) })
+        setErrors({ time: '', date: '' });
+      } else {
+        setFormValues({ ...formValues, date: dayjs(value) })
+        setErrors({ time: '', date: 'La fecha debe ser igual o después de la fecha de hoy.' });
+      }
+    } else if (name === 'user') {
+      setSelectedUser(value);
+      setErrors({ ...errors, user: '' });
     }
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    let postStatus = '';
 
     const newErrors = {
+      user: selectedUser || !userData.isAdmin ? '' : 'Seleccione un usuario',
       selectedServices: formValues.selectedServices.length > 0 ? '' : 'Seleccione al menos un servicio.',
       paymentFile: formValues.paymentFile ? '' : 'Este campo es requerido.',
       time: formValues.time ? '' : 'Este campo es requerido.',
@@ -73,41 +97,67 @@ export default function AgendaForm() {
       return;
     }
 
+    let success = false;
+    let postStatus = '';
+    let appointmentIds = [];
+
     const formattedDate = formValues.date.format('YYYY-MM-DD');
 
     for (const service of formValues.selectedServices) {
-      const serviceInfo = services
-        .find(serv => serv.name === service)
-
-      console.log(serviceInfo)
+      const serviceInfo = services.find(serv => serv.name === service);
 
       const formData = new FormData();
-      formData.append('user', userData.id);
+      formData.append('user', userData.isAdmin ? selectedUser : userData.id);
       formData.append('service', serviceInfo.id);
       formData.append('date', formattedDate);
       formData.append('time', formValues.time);
       formData.append('payment', formValues.paymentFile);
 
-      const response = await fetch(`http://127.0.0.1:8000/appointments`, {
-        method: 'POST',
-        body: formData
-      }).catch(error => {
-        alert("Error al conectar con el servidor.")
-      })
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/appointments`, {
+          method: 'POST',
+          body: formData
+        });
 
-      const newAppResponse = await response.json();
+        const newAppResponse = await response.json();
 
-      if (newAppResponse.status === 201) {
-        // console.log(newAppResponse)
-        postStatus = (`Cita para ${serviceInfo.name} el ${formattedDate} a las ${formValues.time} programa con éxito.`);
-      } else if (newAppResponse.errors[0] === "['Not enough product available for appointment']") {
-        postStatus = ("Debido a la falta de productos necesarios para este servicio, no podemos agendar la cita. Por favor contactarnos para más información.");
-    } else {
-        postStatus = ("Ocurrio un error al guardar el servicio.");
+        if (response.ok) {
+          success = true;
+          appointmentIds.push(newAppResponse.id);
+        } else if (newAppResponse.errors[0] === "['Not enough product available for appointment']") {
+          success = false;
+          postStatus = ("Debido a la falta de productos necesarios para este servicio, no podemos agendar la cita. Por favor contactarnos para más información.");
+          break;
+        } else {
+          success = false;
+          postStatus = 'Ocurrió un error al guardar la cita.';
+          break;
+        }
+      } catch (error) {
+        success = false;
+        postStatus = 'Error al conectar con el servidor.';
+        break;
       }
-    };
+    }
 
-    alert(postStatus);
+    // Delete appointments if one failed
+    if (!success) {
+      for (const id of appointmentIds) {
+        try {
+          const deleteResponse = await fetch(`http://127.0.0.1:8000/appointment/${id}`, {
+            method: 'DELETE'
+          });
+          if (!deleteResponse.ok) {
+            console.error(`Failed to delete appointment with ID ${id}`);
+          }
+        } catch (error) {
+          console.error('Error deleting appointment:', error);
+        }
+      }
+    }
+
+    alert(success ? 'Cita programada con éxito.' : postStatus);
+    
     window.location.reload()
   };
 
@@ -115,7 +165,7 @@ export default function AgendaForm() {
     if (event) event.preventDefault();
     setLoadingServices(true);
     try {
-      console.log('Fetching services');
+      // console.log('Fetching services');
       const response = await fetch(`http://127.0.0.1:8000/services`, {
         method: 'GET',
         headers: {
@@ -143,7 +193,7 @@ export default function AgendaForm() {
     if (event) event.preventDefault();
     setLoadingTimes(true);
     try {
-      console.log('Fetching available times');
+      // console.log('Fetching available times');
       const response = await fetch(`http://127.0.0.1:8000/availabletime/${date}?duration=${duration}`, {
         method: 'GET',
         headers: {
@@ -167,8 +217,31 @@ export default function AgendaForm() {
     }
   }, 500), []); // Debounced function
 
+  const getUsers = async () => {
+    if (!userData.isAdmin) {
+      return;
+    }
+    const response = await fetch(`http://127.0.0.1:8000/users`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).catch(error => {
+      alert("Error al conectar con el servidor.")
+    })
+
+    const usersResponse = await response.json();
+
+    if (usersResponse.status === 200 || usersResponse.status === undefined) {
+      setUsers(usersResponse);
+    } else {
+      alert("Ocurrio un error al obtener los usuarios.");
+    }
+  }
+
   useEffect(() => {
     getServices();
+    getUsers();
   }, []);
 
   useEffect(() => {
@@ -229,33 +302,67 @@ export default function AgendaForm() {
         <Typography variant="h6" gutterBottom align="left" sx={{ margin: '15px 0' }}>Información del Cliente</Typography>
         <Box>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                label="Nombre"
-                value={`${userData.name} ${userData.lastname}`}
-                fullWidth
-                disabled
-                sx={{ backgroundColor: '#fff', '& .MuiInputBase-input.Mui-disabled': { WebkitTextFillColor: '#000' } }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Número de teléfono"
-                value={userData.phone}
-                fullWidth
-                disabled
-                sx={{ backgroundColor: '#fff', '& .MuiInputBase-input.Mui-disabled': { WebkitTextFillColor: '#000' } }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Correo"
-                value={userData.email}
-                fullWidth
-                disabled
-                sx={{ backgroundColor: '#fff', '& .MuiInputBase-input.Mui-disabled': { WebkitTextFillColor: '#000' } }}
-              />
-            </Grid>
+
+
+            {userData.isAdmin &&
+              <Grid item xs={12}>
+                <FormControl fullWidth sx={{ marginBottom: '10px' }}>
+                  <InputLabel>Seleccione un Usuario</InputLabel>
+                  <Select
+                    label="Seleccione un Usuario"
+                    name="user"
+                    value={selectedUser}
+                    onChange={handleChange}
+                    displayEmpty
+                    required
+                  >
+                    <MenuItem value="" disabled>
+                      Seleccione un Usuario
+                    </MenuItem>
+                    {users.map((user) => (
+                      <MenuItem key={user.id} value={user.id}>
+                        <strong>{user.name} {user.lastname}</strong>&nbsp;({user.email})
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  {!!errors.user && (
+                    <Typography variant="body2" color="error" sx={{ textAlign: 'left' }}>{errors.user}</Typography>
+                  )}
+                </FormControl>
+              </Grid>}
+
+
+            {!userData.isAdmin &&
+              <>
+
+                <Grid item xs={12}>
+                  <TextField
+                    label="Nombre"
+                    value={`${userData.name} ${userData.lastname}`}
+                    fullWidth
+                    disabled
+                    sx={{ backgroundColor: '#fff', '& .MuiInputBase-input.Mui-disabled': { WebkitTextFillColor: '#000' } }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Número de teléfono"
+                    value={userData.phone}
+                    fullWidth
+                    disabled
+                    sx={{ backgroundColor: '#fff', '& .MuiInputBase-input.Mui-disabled': { WebkitTextFillColor: '#000' } }}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    label="Correo"
+                    value={userData.email}
+                    fullWidth
+                    disabled
+                    sx={{ backgroundColor: '#fff', '& .MuiInputBase-input.Mui-disabled': { WebkitTextFillColor: '#000' } }}
+                  />
+                </Grid>
+              </>}
           </Grid>
         </Box>
 
@@ -273,7 +380,7 @@ export default function AgendaForm() {
           >
             {services.map((service) => (
               <MenuItem key={service.id} value={service.name}>
-                {service.name}
+                {service.name}&nbsp;({service.duration} min)
               </MenuItem>
             ))}
           </Select>
@@ -289,10 +396,13 @@ export default function AgendaForm() {
                 type="date"
                 name="date"
                 value={formValues.date.format('YYYY-MM-DD')}
-                onChange={(e) => setFormValues({ ...formValues, date: dayjs(e.target.value) })}
+                onChange={handleChange}
                 fullWidth
                 InputLabelProps={{ shrink: true }}
               />
+              {!!errors.date && (
+                <Typography variant="body2" color="error" sx={{ textAlign: 'left' }}>{errors.date}</Typography>
+              )}
             </Grid>
             <Grid item xs={12} sm={6}>
               <FormControl fullWidth>

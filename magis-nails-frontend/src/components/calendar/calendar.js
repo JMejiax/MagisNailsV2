@@ -8,26 +8,13 @@ import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import CalendarDays from './calendar-days';
 
 
-export default function Calendar( {changeDate, Appointments} ) {
+export default function Calendar( {changeDate, appointments} ) {
   const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
   const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
 
   const [currentDay, setCurrentDay] = useState(new Date());
-  const [appointments, setAppointments] = useState([]);
+  // const [appointments, setAppointments] = useState([]);
 
-
-  const fetchAppointments = (day) => {
-    // Simulate an API call
-    const filteredAppointments = Appointments.filter(appointment => {
-      const appointmentDate = new Date(appointment.date);
-      return appointmentDate.getMonth() === day.getMonth() && appointmentDate.getFullYear() === day.getFullYear();
-    });
-    setAppointments(filteredAppointments);
-  };
-
-  useEffect(() => {
-    fetchAppointments(currentDay);
-  }, [currentDay, Appointments]);
 
   const changeCurrentDay = (day) => {
     setCurrentDay(new Date(day.year, day.month, day.number));

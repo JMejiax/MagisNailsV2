@@ -1,41 +1,34 @@
 import React, { useState } from 'react';
 import {
   Container, Table, TableBody, TableCell, TableContainer, TableHead,
-  TableRow, Paper, Typography, Box, TablePagination
+  TableRow, Paper, Typography, Box, TablePagination, Button,
 } from '@mui/material';
-import { PDFDownloadLink, Document, Page, Text, StyleSheet } from '@react-pdf/renderer';
+import ReportModal from './modal-reportes';
 
 const reports = [
-  { id: 1, title: 'Monthly Sales', description: 'A report of the monthly sales.' },
-  { id: 2, title: 'Yearly Sales', description: 'A report of the yearly sales.' },
-  { id: 3, title: 'Customer Feedback', description: 'A report of the customer feedback.' },
-  { id: 4, title: 'Employee Performance', description: 'A report on employee performance.' },
-  { id: 5, title: 'Inventory Status', description: 'A report of the inventory status.' },
-  { id: 6, title: 'Quarterly Analysis', description: 'A report of the quarterly analysis.' },
-  { id: 7, title: 'Market Trends', description: 'A report of the market trends.' },
-  { id: 8, title: 'Profit and Loss', description: 'A report of the profit and loss.' },
-  { id: 9, title: 'Annual Budget', description: 'A report of the annual budget.' },
-  { id: 10, title: 'Strategic Plan', description: 'A report of the strategic plan.' },
+  { id: 1, title: 'Actividad de Inicio de Sesión de Usuarios', description: 'Lista de usuarios con el número de intentos fallidos de inicio de sesión. Incluye detalles como nombre, correo electrónico y si están bloqueados.', requiresDates: false, requiresUser: false, url: '' },
+  { id: 2, title: 'Uso de Servicios', description: 'Número de citas para cada servicio. Incluye detalles como nombre del servicio, número total de citas y los ingresos totales generados por cada servicio.', requiresDates: false, requiresUser: false, url: '' },
+  { id: 3, title: 'Uso de Productos', description: 'Número de unidades de cada producto utilizadas en servicios. Incluye detalles como nombre del producto, total de unidades utilizadas y stock restante.', requiresDates: false, requiresUser: false, url: '' },
+  { id: 4, title: 'Historial de Citas por Usuario', description: 'Lista de todas las citas de un usuario específico. Incluye detalles como nombre del servicio, fecha y hora de la cita y costo total.', requiresDates: false, requiresUser: true, url: '' },
+  { id: 5, title: 'Citas por Servicio por fecha', description: 'Resumen de las citas para cada servicio durante un período específico. Incluye detalles como nombre del servicio, número de citas y los ingresos totales.', requiresDates: true, requiresUser: false, url: '' },
+  { id: 6, title: 'Informe de Ingresos por fecha', description: 'Ingresos totales generados durante un período específico, desglosados por servicio y uso de productos.', requiresDates: true, requiresUser: false, url: '' },
 ];
-
-const ReportDocument = ({ title, description }) => (
-  <Document>
-    <Page style={styles.page}>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.description}>{description}</Text>
-    </Page>
-  </Document>
-);
-
-const styles = StyleSheet.create({
-  page: { padding: 30 },
-  title: { fontSize: 24, marginBottom: 10 },
-  description: { fontSize: 14 },
-});
 
 export default function Reportes() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleClick = (report) => {
+    setSelectedReport(report);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedReport(null);
+    setIsModalOpen(false);
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -86,19 +79,13 @@ export default function Reportes() {
                 <TableCell>{report.title}</TableCell>
                 <TableCell>{report.description}</TableCell>
                 <TableCell>
-                  <PDFDownloadLink
-                    document={<ReportDocument title={report.title} description={report.description} />}
-                    fileName={`${report.title}.pdf`}
-                    style={{
-                      textDecoration: 'none',
-                      color: '#fff',
-                      backgroundColor: '#f48fb1',
-                      padding: '5px 10px',
-                      borderRadius: '4px'
-                    }}
+                  <Button
+                    variant="contained"                    
+                    onClick={() => handleClick(report)}
+                    sx={{ marginRight: 1, backgroundColor: '#f48fb1' }}
                   >
-                    {({ loading }) => (loading ? 'Cargando...' : 'Descargar')}
-                  </PDFDownloadLink>
+                    Generar
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -114,6 +101,13 @@ export default function Reportes() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>
+      {selectedReport && (
+        <ReportModal
+          open={isModalOpen}
+          handleClose={handleCloseModal}
+          report={selectedReport}
+        />
+      )}
     </Container>
   );
 }

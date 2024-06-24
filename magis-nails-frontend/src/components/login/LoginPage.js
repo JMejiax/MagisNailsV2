@@ -122,33 +122,33 @@ export default function LoginPage() {
               }}>
                 <Typography
                   component="p"
-                  fontStyle={'italic'}
                   color={'#000'}
                   sx={{
+                    fontWeight: '300',
                     textDecoration: 'underline',
-                    textDecorationColor: '#e76f00',
+                    textDecorationColor: '#f48fb1',
                     textDecorationThickness: '1px',
                     textUnderlineOffset: '4px',
                     cursor: 'pointer' // Makes the text look clickable
                   }}
                   onClick={handleOpenForgotPasswordModal}
                 >
-                  FORGOT PASSWORD?
+                  OLVIDÉ MI CONTRASEÑA
                 </Typography>
                 <Typography
                   component="p"
-                  fontStyle={'italic'}
                   color={'#000'}
                   sx={{
+                    fontWeight: '300',
                     textDecoration: 'underline',
-                    textDecorationColor: '#e76f00',
+                    textDecorationColor: '#f48fb1',
                     textDecorationThickness: '1px',
                     textUnderlineOffset: '4px',
                     cursor: 'pointer'
                   }}
                   onClick={handleOpenCreateAccountModal}
                 >
-                  CREATE ACCOUNT
+                  CREAR CUENTA
                 </Typography>
               </Box>
             </Box>

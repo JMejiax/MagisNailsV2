@@ -13,6 +13,7 @@ export default function UserModal({ open, handleClose, user, handleSave }) {
         password: '',
         admin: user.isAdmin,
         active: user.isActive,
+        isLocked: user.isLocked,
     });
 
     const [errors, setErrors] = useState({
@@ -161,6 +162,16 @@ export default function UserModal({ open, handleClose, user, handleSave }) {
                         />
                     }
                     label="Activo"
+                />
+                <FormControlLabel
+                    control={
+                        <Switch
+                            checked={formValues.isLocked}
+                            onChange={handleChange}
+                            name="isLocked"
+                        />
+                    }
+                    label="Bloqueado"
                 />
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2, gap: 2 }}>
                     <Button

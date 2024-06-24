@@ -1,11 +1,13 @@
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
+from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth import get_user_model, authenticate
+from django.db.models import Count, Sum
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from datetime import datetime, timedelta, time
@@ -166,6 +168,7 @@ def service_detail(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET', 'POST'])
+@parser_classes([MultiPartParser, FormParser])
 def appointment_list(request):
     if request.method == 'GET':
         appointments = Appointment.objects.order_by('date', 'time')
@@ -286,6 +289,26 @@ def available_times(request, date):
     available_times_list = get_available_times(date, duration)
     return Response({"available_times": available_times_list}, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+def get_appointments_by_month(request, year, month):
+    try:
+        # Convertir los parámetros a enteros
+        year = int(year)
+        month = int(month)
+        
+        # Filtrar las citas por año y mes
+        appointments = Appointment.objects.filter(date__year=year, date__month=month).order_by('date', 'time')
+
+        # Serializar las citas
+        serializer = AppointmentSerializer(appointments, many=True)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    except ValueError:
+        return Response({'error': 'Año o mes inválidos.'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 @api_view(['POST'])
 def get_appointments_by_date(request):
     try:
@@ -322,3 +345,48 @@ def get_appointments_by_date(request):
     
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+    
+# REPORTS
+@api_view(['GET'])
+def user_login_activity_report(request):
+    users = User.objects.values('name', 'lastname', 'email', 'failedLogins', 'isLocked', 'last_login')
+    return Response(users)
+
+@api_view(['GET'])
+def service_usage_report(request):
+    service_usage = Appointment.objects.values('service__name').annotate(
+        total_appointments=Count('id'),
+        total_revenue=Sum('totalCost')
+    )
+    return Response(service_usage)
+
+@api_view(['GET'])
+def product_usage_report(request):
+    product_usage = ServiceProduct.objects.values('product__name').annotate(
+        total_units_used=Sum('units_to_reduce')
+    )
+    return Response(product_usage)
+
+@api_view(['GET'])
+def user_appointment_history_report(request, user_id):
+    appointments = Appointment.objects.filter(user_id=user_id).values(
+        'service__name', 'date', 'time', 'totalCost'
+    )
+    return Response(appointments)
+
+@api_view(['GET'])
+def service_appointment_summary_report(request, start_date, end_date):
+    service_summary = Appointment.objects.filter(date__range=[start_date, end_date]).values(
+        'service__name'
+    ).annotate(
+        total_appointments=Count('id'),
+        total_revenue=Sum('totalCost')
+    )
+    return Response(service_summary)
+
+@api_view(['GET'])
+def revenue_report(request, start_date, end_date):
+    revenue = Appointment.objects.filter(date__range=[start_date, end_date]).aggregate(
+        total_revenue=Sum('totalCost')
+    )
+    return Response(revenue)

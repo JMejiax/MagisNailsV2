@@ -35,7 +35,8 @@ export default function Usuarios() {
             phone: updatedUser.phone,
             email: updatedUser.email,
             isAdmin: updatedUser.admin,
-            isActive: updatedUser.active
+            isActive: updatedUser.active,
+            isLocked: updatedUser.isLocked
         };
     
         if (updatedUser.password !== '') {

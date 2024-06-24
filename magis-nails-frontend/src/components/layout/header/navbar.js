@@ -3,7 +3,7 @@ import AuthContext from "../../../context/AuthContext";
 import Box from '@mui/material/Box';
 import { NavLink } from "react-router-dom";
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import { Tooltip, IconButton, Drawer, List, ListItem, ListItemText, AppBar, Toolbar } from "@mui/material";
+import { Tooltip, IconButton, Drawer, List, ListItem, ListItemText, AppBar, Toolbar, Typography } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 
 export default function Navbar() {
@@ -104,8 +104,8 @@ export default function Navbar() {
           </Box>
           {user && (
             <Box sx={{ display: 'flex', alignItems: 'center', paddingRight: '10px' }}>
-              <Tooltip title="Cerrar sesión">
-                <ExitToAppIcon onClick={logoutUser} sx={{ cursor: 'pointer', color: '#E5383B', fontSize: '35px' }} />
+              <Tooltip title={userData.email}>
+                <ExitToAppIcon onClick={logoutUser} sx={{ cursor: 'pointer', color: '#FD5DA5', fontSize: '35px' }} />
               </Tooltip>
             </Box>
           )}

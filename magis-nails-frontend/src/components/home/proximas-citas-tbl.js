@@ -7,17 +7,15 @@ import {
   TableHead,
   TableRow,
   Paper,
-  TablePagination
+  TablePagination,
+  Alert
 } from '@mui/material';
 import EventModal from './citas-modal';
+import dayjs from 'dayjs';
 
 export default function UpcomingEventsTable({ events, date, updateApp }) {
   // Filter and group events by date and time
   const groupedEvents = events
-    .filter(event => {
-      const eventDate = new Date(event.date);
-      return eventDate.getMonth() === date.getMonth() && eventDate.getFullYear() === date.getFullYear();
-    })
     .reduce((groups, event) => {
       const key = `${event.date}-${event.time}`; // Unique key based on date and time
 
@@ -58,6 +56,11 @@ export default function UpcomingEventsTable({ events, date, updateApp }) {
     getServices();
   }, []);
 
+  useEffect(() => {
+    // Reset page to 0 whenever events or date changes
+    setPage(0);
+  }, [events, date]);
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -68,7 +71,12 @@ export default function UpcomingEventsTable({ events, date, updateApp }) {
   };
 
   const handleRowClick = (eventsGroup) => {
-    setSelectedEventsGroup(eventsGroup);
+    const currDate = dayjs().format('YYYY-MM-DD');
+    if(eventsGroup[0].date < currDate){
+      alert("La cita seleccionada es de una fecha pasada por lo que no se puede editar.")
+    }else{
+      setSelectedEventsGroup(eventsGroup);
+    }
   };
 
   const handleModalClose = () => {
@@ -95,17 +103,17 @@ export default function UpcomingEventsTable({ events, date, updateApp }) {
       })
 
       const infoChangeResponse = await response.json();
-      console.log(response.ok)
+      // console.log(response.ok)
       if (response.ok) {
         putStatus = "Se actualizó la cita satisfactoriamente.";
         updateApp();
-        console.log(infoChangeResponse)
+        // console.log(infoChangeResponse)
       } else if (infoChangeResponse.errors[0] === "['Not enough product available for appointment']") {
         putStatus = "Debido a la falta de productos necesarios para este servicio, no podemos agendar la cita. Por favor contactarnos para más información.";
-        console.log(infoChangeResponse)
+        // console.log(infoChangeResponse)
       } else {
         putStatus = "Error al actualizar la cita.";
-        console.log(infoChangeResponse)
+        // console.log(infoChangeResponse)
       }
 
     };

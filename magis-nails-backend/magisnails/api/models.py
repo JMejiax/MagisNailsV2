@@ -139,9 +139,20 @@ class Appointment(models.Model):
                             product.quantity -= service_product.units_to_reduce
                             product.save()
                         else:
-                            raise ValidationError(f"Not enough {product.name} available for appointment")
+                            raise ValidationError(f"Not enough product available for appointment")
 
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # Restore product quantities before deleting the appointment
+        service_products = ServiceProduct.objects.filter(service=self.service)
+        for service_product in service_products:
+            product = service_product.product
+            if product.isActive:  # Check if the product is active
+                product.quantity += service_product.units_to_reduce
+                product.save()
+
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return f'Appointment for {self.user.name} on {self.date} at {self.time}'

@@ -5,7 +5,7 @@ import UpcomingEventsTable from './proximas-citas-tbl';
 import AuthContext from '../../context/AuthContext';
 
 const months = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre','Diciembre'
+  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
 ];
 
 export default function Home() {
@@ -19,32 +19,33 @@ export default function Home() {
   }
 
   const getApp = async () => {
-    const response = await fetch(`http://127.0.0.1:8000/appointments`, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
+    const response = await fetch(`http://127.0.0.1:8000/appointment/${selectedDate.getFullYear()}/${selectedDate.getMonth()+1}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
     }).catch(error => {
-        alert("Error al conectar con el servidor.")
+      alert("Error al conectar con el servidor.")
     })
 
     const appsResponse = await response.json();
 
-    if (appsResponse.status === 200 || appsResponse.status === undefined) {
-      if(userData.isAdmin){
+    if (response.ok) {
+      // console.log(appsResponse)
+      if (userData.isAdmin) {
         setApps(appsResponse);
-      }else{
+      } else {
         const currUserApp = appsResponse.filter((app) => app.user === userData.id)
         setApps(currUserApp);
       }
     } else {
-        alert("Ocurrio un error al obtener los usuarios.");
+      alert("Ocurrio un error al obtener los usuarios.");
     }
-}
+  }
 
-useEffect(() => {
-  getApp();
-}, []);
+  useEffect(() => {
+    getApp();
+  }, [selectedDate]);
 
 
   return (
@@ -61,7 +62,7 @@ useEffect(() => {
       >
         <Grid container justifyContent="space-around" spacing={2}>
           <Grid item xs={12} md={6}>
-            <Calendar changeDate={handleDateChange} Appointments={apps} />
+            <Calendar changeDate={handleDateChange} appointments={apps} />
           </Grid>
           <Divider orientation="vertical" flexItem />
           <Grid item xs={12} md={5}>

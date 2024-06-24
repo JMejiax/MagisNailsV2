@@ -56,8 +56,11 @@ export const AuthProvider = ({ children }) => {
 
             if (userResponse.status === 200) {
                 if (!userData.isActive){
-                    alert("El usuario se encuentra desactivado, porfavor contacte al administrador de la página.");
-                    navigate('login');
+                    alert("El usuario se encuentra inactivo, porfavor contacte al administrador de la página.");
+                    return;
+                }else if(userData.isLocked){
+                    alert("El usuario se encuentra bloqueado, porfavor contacte al administrador de la página.");
+                    return;
                 }
                 setUserData(userData);
                 
