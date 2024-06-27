@@ -11,7 +11,7 @@ const reports = [
   { id: 3, title: 'Uso de Productos', description: 'Número de unidades de cada producto utilizadas en servicios. Incluye detalles como nombre del producto, total de unidades utilizadas y stock restante.', requiresDates: false, requiresUser: false, url: '' },
   { id: 4, title: 'Historial de Citas por Usuario', description: 'Lista de todas las citas de un usuario específico. Incluye detalles como nombre del servicio, fecha y hora de la cita y costo total.', requiresDates: false, requiresUser: true, url: '' },
   { id: 5, title: 'Citas por Servicio por fecha', description: 'Resumen de las citas para cada servicio durante un período específico. Incluye detalles como nombre del servicio, número de citas y los ingresos totales.', requiresDates: true, requiresUser: false, url: '' },
-  { id: 6, title: 'Informe de Ingresos por fecha', description: 'Ingresos totales generados durante un período específico, desglosados por servicio y uso de productos.', requiresDates: true, requiresUser: false, url: '' },
+  { id: 6, title: 'Informe de Ingresos por fecha', description: 'Ingresos totales generados durante un período específico.', requiresDates: true, requiresUser: false, url: '' },
 ];
 
 export default function Reportes() {

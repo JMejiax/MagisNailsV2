@@ -103,7 +103,7 @@ const ProductUsageReport = ({ reportData }) => {
                         {/* Table Rows */}
                         {reportData.map((product, index) => (
                             <View style={styles.tableRow} key={index}>
-                                <Text style={styles.tableCol}>{product.product__name}</Text>
+                                <Text style={styles.tableCol}>{product.name}</Text>
                                 <Text style={styles.tableCol}>{product.total_units_used}</Text>
                             </View>
                         ))}

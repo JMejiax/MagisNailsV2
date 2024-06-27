@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Container, Grid, Card, CardMedia, CardContent, Typography, CardActions, Button } from '@mui/material';
+import { Box, Container, Grid, Card, CardMedia, CardContent, Typography, CardActions, Button, Tooltip } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ErrorIcon from '@mui/icons-material/Error'; // Icon for indicating no products available
 import { useNavigate } from "react-router-dom";
 
 export default function AgendaServicios() {
@@ -9,11 +10,21 @@ export default function AgendaServicios() {
   const [services, setServices] = useState([]);
 
   const redirectWhatsapp = (service) => {
-    // `https://wa.me/+50661119446?text=`
     const phoneNumber = '+50661119446';
     const text = `Hola, me gustaría obtener más información sobre el servicio: ${service.name} (${service.description}) que cuesta ₡${service.price} y dura ${service.duration} minutos.`;
     const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(text)}`;
     window.open(url, '_blank');
+  }
+
+  const checkServiceAvailability = async (serviceId) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/validate_service/${serviceId}/`);
+      const data = await response.json();
+      return data.available; // Return true or false based on availability
+    } catch (error) {
+      console.error('Error checking service availability:', error);
+      return false; // Default to false if there's an error
+    }
   }
 
   const getServices = async () => {
@@ -29,10 +40,16 @@ export default function AgendaServicios() {
     const servicesResponse = await response.json();
 
     if (servicesResponse.status === 200 || servicesResponse.status === undefined) {
-      setServices(servicesResponse);
-      // console.log(servicesResponse)
+      const activeServices = servicesResponse.filter(serv => serv.isActive);
+      setServices(activeServices);
+      // Check availability for each service
+      activeServices.forEach(async (service) => {
+        const isAvailable = await checkServiceAvailability(service.id);
+        service.isAvailable = isAvailable; // Add a property to service indicating availability
+        setServices([...activeServices]); // Update state to trigger re-render
+      });
     } else {
-      alert("Ocurrio un error al obtener los usuarios.");
+      alert("Ocurrio un error al obtener los servicios.");
     }
   }
 
@@ -94,7 +111,11 @@ export default function AgendaServicios() {
                       {service.duration} mins
                     </Typography>
                   </Box>
-
+                  { !service.isAvailable && (
+                    <Tooltip title={'Debido a la falta de materiales este servicio no esta disponible. Click en "Mas Información" para hablar con un agente.'}>
+                    <ErrorIcon sx={{ color: 'red', fontSize: 20 }} />
+                    </Tooltip>
+                  )}
                 </Box>
               </CardContent>
               <CardActions>

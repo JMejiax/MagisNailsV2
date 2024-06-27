@@ -7,7 +7,8 @@ from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth import get_user_model, authenticate
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, F, Q, Value, Subquery, OuterRef
+from django.db.models.functions import Coalesce
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from datetime import datetime, timedelta, time
@@ -127,6 +128,8 @@ def get_user_by_email(request):
 
     try:
         user = User.objects.get(email=email)
+        if user.isActive and not user.isLocked:
+            user.update_last_login()
     except User.DoesNotExist:
         return Response({"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -166,6 +169,22 @@ def service_detail(request, pk):
     elif request.method == 'DELETE':
         service.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+@api_view(['GET'])
+def validate_service(request, service_id):
+    try:
+        service = Service.objects.get(pk=service_id, isActive=True)
+    except Service.DoesNotExist:
+        return Response({'status': 'error', 'message': 'Service does not exist or is inactive.'}, status=404)
+
+    service_products = ServiceProduct.objects.filter(service=service)
+
+    for service_product in service_products:
+        product = service_product.product
+        if product.isActive and product.quantity < service_product.units_to_reduce:
+            return Response({'status': 'error', 'available': False}, status=400)
+
+    return Response({'status': 'success', 'available': True}, status=200)
 
 @api_view(['GET', 'POST'])
 @parser_classes([MultiPartParser, FormParser])
@@ -360,12 +379,35 @@ def service_usage_report(request):
     )
     return Response(service_usage)
 
+# @api_view(['GET'])
+# def product_usage_report(request):
+#     product_usage = ServiceProduct.objects.values('product__name').annotate(
+#         total_units_used=Sum('units_to_reduce')
+#     )
+#     return Response(product_usage)
 @api_view(['GET'])
 def product_usage_report(request):
-    product_usage = ServiceProduct.objects.values('product__name').annotate(
-        total_units_used=Sum('units_to_reduce')
-    )
-    return Response(product_usage)
+    # Step 1: Get all products and store them in a dictionary
+    products = Product.objects.all()
+    product_usage_dict = {product.id: {'name': product.name, 'total_units_used': 0} for product in products}
+
+    # Step 2: Get all appointments
+    appointments = Appointment.objects.all()
+
+    # Step 3 & 4: Iterate through each appointment and update the product usage
+    for appointment in appointments:
+        service_id = appointment.service.id
+        service_products = ServiceProduct.objects.filter(service_id=service_id)
+        
+        for service_product in service_products:
+            product_id = service_product.product.id
+            if product_id in product_usage_dict:
+                product_usage_dict[product_id]['total_units_used'] += service_product.units_to_reduce
+
+    # Convert dictionary to a list for the response
+    product_usage_list = [{'name': value['name'], 'total_units_used': value['total_units_used']} for key, value in product_usage_dict.items()]
+
+    return Response(product_usage_list)
 
 @api_view(['GET'])
 def user_appointment_history_report(request, user_id):

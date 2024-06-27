@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     },
     tableColHeader: {
         width: '100%',
-        fontSize: 12,
+        fontSize: 14,
         borderStyle: 'solid',
         borderColor: colors.lightGray,
         borderBottomColor: colors.primary,
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     },
     tableCol: {
         width: '100%',
-        fontSize: 8,
+        fontSize: 12,
         borderStyle: 'solid',
         borderColor: colors.lightGray,
         borderWidth: 1,
@@ -93,7 +93,7 @@ export default function RevenueReport({ reportData }) {
 
                     {/* Table Row */}
                     <View style={styles.tableRow}>
-                        <Text style={styles.tableCol}>{reportData.total_revenue}</Text>
+                        <Text style={styles.tableCol}>{reportData.total_revenue ? reportData.total_revenue : 'No se registran ingresos en el periodo seleccionado.' }</Text>
                     </View>
                 </View>
 

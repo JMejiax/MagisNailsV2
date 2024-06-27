@@ -40,7 +40,6 @@ export default function AgendaForm() {
   const [errors, setErrors] = useState({
     user: '',
     selectedServices: '',
-    paymentFile: '',
     date: '',
   });
 
@@ -52,9 +51,7 @@ export default function AgendaForm() {
       [name]: type === 'file' ? files[0] : value,
     });
 
-    if (type === 'file' && files.length > 0) {
-      setErrors({ ...errors, paymentFile: '' });
-    } else if (name === 'selectedServices' && value.length > 0) {
+    if (name === 'selectedServices' && value.length > 0) {
       setErrors({ ...errors, selectedServices: '' });
     } else if (name === 'time' && value !== '') {
       if (formValues.date.format('YYYY-MM-DD') === dayjs(new Date()).format('YYYY-MM-DD')) {
@@ -87,7 +84,6 @@ export default function AgendaForm() {
     const newErrors = {
       user: selectedUser || !userData.isAdmin ? '' : 'Seleccione un usuario',
       selectedServices: formValues.selectedServices.length > 0 ? '' : 'Seleccione al menos un servicio.',
-      paymentFile: formValues.paymentFile ? '' : 'Este campo es requerido.',
       time: formValues.time ? '' : 'Este campo es requerido.',
     };
 
@@ -111,7 +107,9 @@ export default function AgendaForm() {
       formData.append('service', serviceInfo.id);
       formData.append('date', formattedDate);
       formData.append('time', formValues.time);
-      formData.append('payment', formValues.paymentFile);
+      if(formValues.paymentFile){
+        formData.append('payment', formValues.paymentFile);
+      }
 
       try {
         const response = await fetch(`http://127.0.0.1:8000/appointments`, {

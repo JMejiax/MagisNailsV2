@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
 class UserManager(BaseUserManager):
     def create_user(self, email, name, lastname, phone, password, isAdmin=False, isActive=True, failedLogins=0, isLocked=False):
@@ -72,6 +73,10 @@ class User(AbstractBaseUser):
     @property
     def is_superuser(self):
         return self.isAdmin
+    
+    def update_last_login(self):
+        self.last_login = timezone.now()
+        self.save(update_fields=['last_login'])
 
 class Service(models.Model):
     id = models.AutoField(primary_key=True)
@@ -119,7 +124,7 @@ class Appointment(models.Model):
     date = models.DateField()
     time = models.TimeField()
     duration = models.PositiveIntegerField(help_text='Duration in minutes', default=0)
-    payment = models.FileField(upload_to='files/appointment_payments/')
+    payment = models.FileField(upload_to='files/appointment_payments/', blank=True, null=True)
 
     REQUIRED_FIELDS = ['user', 'service', 'date', 'time', 'payment']
 

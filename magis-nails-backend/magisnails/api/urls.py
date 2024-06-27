@@ -18,6 +18,7 @@ urlpatterns = [
     # SERVICE MANAGEMENT
     path("services", views.service_list, name="services"),
     path("service/<str:pk>", views.service_detail, name="service"),
+    path('validate_service/<int:service_id>/', views.validate_service, name='validate_service'),
 
     # APPOINTMENT MANAGEMENT
     path("appointments", views.appointment_list, name="appointments"),

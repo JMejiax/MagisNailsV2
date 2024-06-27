@@ -8,12 +8,14 @@ import {
   TableRow,
   Paper,
   TablePagination,
-  Alert
 } from '@mui/material';
 import EventModal from './citas-modal';
 import dayjs from 'dayjs';
+import AuthContext from '../../context/AuthContext';
 
 export default function UpcomingEventsTable({ events, date, updateApp }) {
+  const { userData } = React.useContext(AuthContext);
+
   // Filter and group events by date and time
   const groupedEvents = events
     .reduce((groups, event) => {
@@ -28,6 +30,7 @@ export default function UpcomingEventsTable({ events, date, updateApp }) {
     }, {});
 
   const [services, setServices] = useState([]);
+  const [users, setUsers] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selectedEventsGroup, setSelectedEventsGroup] = useState(null); // State to store selected events group
@@ -52,8 +55,28 @@ export default function UpcomingEventsTable({ events, date, updateApp }) {
     }
   };
 
+  const getUsers = async () => {
+    const response = await fetch(`http://127.0.0.1:8000/users`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).catch(error => {
+        alert("Error al conectar con el servidor.")
+      })
+  
+      const usersResponse = await response.json();
+  
+      if (usersResponse.status === 200 || usersResponse.status === undefined) {
+        setUsers(usersResponse);
+      } else {
+        alert("Ocurrio un error al obtener los usuarios.");
+      }
+}
+
   useEffect(() => {
     getServices();
+    getUsers();
   }, []);
 
   useEffect(() => {
@@ -130,6 +153,7 @@ export default function UpcomingEventsTable({ events, date, updateApp }) {
         <Table>
           <TableHead>
             <TableRow style={{ backgroundColor: '#f48fb1' }}>
+              { userData.isAdmin && <TableCell>Cliente</TableCell>}
               <TableCell>Servicio</TableCell>
               <TableCell>Fecha</TableCell>
               <TableCell>Hora</TableCell>
@@ -143,8 +167,11 @@ export default function UpcomingEventsTable({ events, date, updateApp }) {
                 return service ? service.name : 'Servicio no encontrado';
               }).join(', ');
 
+              const user = users.find(user => user.id === groupedEvents[key][0].user);
+
               return (
                 <TableRow key={index} onClick={() => handleRowClick(eventsGroup)} style={{ cursor: 'pointer' }}>
+                  {userData.isAdmin && <TableCell>{user.name}&nbsp;{user.lastname}</TableCell>}
                   <TableCell>{serviceNames}</TableCell>
                   <TableCell>{eventsGroup[0].date}</TableCell>
                   <TableCell>{eventsGroup[0].time}</TableCell>
