@@ -27,6 +27,11 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontWeight: 'bold',
     },
+    headerInfoText: {
+        fontSize: 12,
+        color: '#fff',
+        marginTop: 5,
+    },
     table: {
         display: 'table',
         width: 'auto',
@@ -75,13 +80,17 @@ const styles = StyleSheet.create({
     },
 });
 
-export default function RevenueReport({ reportData }) {
+export default function RevenueReport({ reportData, reportFilterData }) {
+    const { startDate, endDate } = reportFilterData;
+
     return (
         <Document>
             <Page size="A4" style={styles.page}>
                 {/* Header */}
                 <View style={styles.header}>
                     <Text style={styles.headerText}>MagisNails | Reporte de Ganancias</Text>
+                    <Text style={styles.headerInfoText}>Fecha de inicio: {startDate}</Text>
+                    <Text style={styles.headerInfoText}>Fecha de fin: {endDate}</Text>
                 </View>
 
                 {/* Table */}
@@ -93,7 +102,11 @@ export default function RevenueReport({ reportData }) {
 
                     {/* Table Row */}
                     <View style={styles.tableRow}>
-                        <Text style={styles.tableCol}>{reportData.total_revenue ? reportData.total_revenue : 'No se registran ingresos en el periodo seleccionado.' }</Text>
+                        <Text style={styles.tableCol}>
+                            {reportData.total_revenue
+                                ? reportData.total_revenue
+                                : 'No se registran ingresos en el periodo seleccionado.'}
+                        </Text>
                     </View>
                 </View>
 
@@ -103,4 +116,3 @@ export default function RevenueReport({ reportData }) {
         </Document>
     );
 };
-

@@ -90,9 +90,9 @@ export default function RegistroForm({ open, handleClose }) {
       alert("Error al conectar con el servidor.")
     })
 
-    const newUserResponse = await response.json();
+    // const newUserResponse = await response.json();
 
-    if (newUserResponse.status === 201) {
+    if (response.ok) {
       alert(`Usuario (${formValues.email}) creado con éxito.`);
     } else {
       alert("Ya existe un usuario con el correo ingresado.");

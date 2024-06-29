@@ -119,6 +119,7 @@ export default function UpcomingEventsTable({ events, date, updateApp }) {
       const formData = new FormData();
       if (isComplete) {
         formData.append("isComplete", isComplete);
+
       } else if (!isComplete && !paymentFile) {
         formData.append("date", updatedDate);
         formData.append("time", updatedTime);
@@ -233,6 +234,7 @@ export default function UpcomingEventsTable({ events, date, updateApp }) {
           handleClose={handleModalClose}
           events={selectedEventsGroup}
           handleSave={handleSaveEvent}
+          isAdmin={userData.isAdmin}
         />
       )}
     </Paper>) : (<Paper>
@@ -248,7 +250,7 @@ export default function UpcomingEventsTable({ events, date, updateApp }) {
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableRow style={{ }}>
+            <TableRow style={{}}>
               <TableCell colSpan={5} sx={{ textAlign: 'center' }}>No tiene citas programadas.</TableCell>
             </TableRow>
           </TableBody>

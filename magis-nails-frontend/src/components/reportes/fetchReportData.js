@@ -6,12 +6,22 @@ import UserAppointmentHistoryReport from './UserAppointmentHistoryReport';
 import ServiceAppointmentSummaryReport from './ServiceAppointmentSummaryReport';
 import RevenueReport from './RevenueReport';
 
-const FetchReportData = ({ report, startDate, endDate, selectedUser }) => {
+const FetchReportData = ({ report, startDate, endDate, selectedUser, userName }) => {
     const [reportData, setReportData] = useState([]);
+    const [reportFilterData, setFilterReportData] = useState({
+        userName: userName,
+        startDate: startDate,
+        endDate: endDate
+    });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         setLoading(true);
+        setFilterReportData({
+            userName: userName,
+            startDate: startDate,
+            endDate: endDate
+        });
 
         let url = '';
 
@@ -63,7 +73,7 @@ const FetchReportData = ({ report, startDate, endDate, selectedUser }) => {
 
         fetchData();
 
-    }, [report.id, startDate, endDate, selectedUser]);
+    }, [report.id, startDate, endDate, selectedUser, userName]);
 
     const getReportComponent = useMemo(() => {
         switch (report.id) {
@@ -74,15 +84,16 @@ const FetchReportData = ({ report, startDate, endDate, selectedUser }) => {
             case 3:
                 return <ProductUsageReport reportData={reportData} />;
             case 4:
-                return <UserAppointmentHistoryReport reportData={reportData} />;
+                return <UserAppointmentHistoryReport reportData={reportData} reportFilterData={reportFilterData} />;
             case 5:
-                return <ServiceAppointmentSummaryReport reportData={reportData} />;
+                return <ServiceAppointmentSummaryReport reportData={reportData} reportFilterData={reportFilterData} />;
             case 6:
-                return <RevenueReport reportData={reportData} />;
+                return <RevenueReport reportData={reportData} reportFilterData={reportFilterData} />;
             default:
                 return null;
         }
-    }, [report.id, reportData]);
+
+    }, [report.id, reportData, reportFilterData]);
 
     return (
         <>

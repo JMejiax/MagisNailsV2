@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 const ReportModal = ({ open, handleClose, report }) => {
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState('');
+    const [userName, setUserName] = useState('');
     const [startDate, setStartDate] = useState(dayjs().format('YYYY-MM-DD'));
     const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'));
     const [disableDownload, setDisableDownload] = useState(false);
@@ -64,6 +65,11 @@ const ReportModal = ({ open, handleClose, report }) => {
     const handleUserChange = (event) => {
         const value = event.target.value;
         setSelectedUser(value);
+
+        const user = users.find(user => user.id===value);
+        const userName = user.name + ' ' + user.lastname;
+        setUserName(userName);
+
         setDisableDownload(false);
         setErrors(prevErrors => ({ ...prevErrors, selectedUser: '' }));
     };
@@ -96,6 +102,7 @@ const ReportModal = ({ open, handleClose, report }) => {
                                 startDate={startDate}
                                 endDate={endDate}
                                 selectedUser={selectedUser}
+                                userName={userName}
                             />
                         }
                         fileName={`${report.title}.pdf`}

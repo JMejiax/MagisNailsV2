@@ -19,12 +19,15 @@ const styles = StyleSheet.create({
         backgroundColor: colors.primary,
         padding: 10,
         marginBottom: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
     },
     headerText: {
         fontSize: 16,
         color: '#fff',
+    },
+    headerInfoText: {
+        fontSize: 12,
+        color: '#fff',
+        marginTop: 5,
     },
     footer: {
         position: 'absolute',
@@ -82,13 +85,17 @@ const styles = StyleSheet.create({
     },
 });
 
-const ServiceAppointmentSummaryReport = ({ reportData }) => {
+const ServiceAppointmentSummaryReport = ({ reportData, reportFilterData }) => {
+    const { startDate, endDate } = reportFilterData;
+
     return (
         <Document>
             <Page size="A4" style={styles.page}>
                 {/* Header */}
                 <View style={styles.header}>
                     <Text style={styles.headerText}>MagisNails | Reporte de Citas por Servicio</Text>
+                    <Text style={styles.headerInfoText}>Fecha de inicio: {startDate}</Text>
+                    <Text style={styles.headerInfoText}>Fecha de fin: {endDate}</Text>
                 </View>
 
                 {/* Table */}

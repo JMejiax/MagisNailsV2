@@ -82,13 +82,16 @@ const styles = StyleSheet.create({
     },
 });
 
-const UserAppointmentHistoryReport = ({ reportData }) => {
+const UserAppointmentHistoryReport = ({ reportData, reportFilterData }) => {
+    const { userName } = reportFilterData;
+
     return (
         <Document>
             <Page size="A4" style={styles.page}>
                 {/* Header */}
                 <View style={styles.header}>
                     <Text style={styles.headerText}>MagisNails | Historial de Citas por Usuario</Text>
+                    <Text style={styles.headerText}>{userName}</Text>
                 </View>
 
                 {/* Table */}
