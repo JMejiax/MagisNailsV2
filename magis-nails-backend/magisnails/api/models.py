@@ -125,6 +125,7 @@ class Appointment(models.Model):
     time = models.TimeField()
     duration = models.PositiveIntegerField(help_text='Duration in minutes', default=0)
     payment = models.FileField(upload_to='files/appointment_payments/', blank=True, null=True)
+    isComplete = models.BooleanField(default=False)
 
     REQUIRED_FIELDS = ['user', 'service', 'date', 'time', 'payment']
 

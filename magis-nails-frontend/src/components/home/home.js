@@ -49,7 +49,7 @@ export default function Home() {
 
 
   return (
-    <Container maxWidth="xl" sx={{ paddingTop: '20px', overflow: 'hidden', marginBottom: "25px" }}>
+    <Container  maxWidth={false} sx={{ paddingTop: '20px', overflow: 'hidden', marginBottom: "25px", width: '100%' }}>
       <Box
         sx={{
           width: '100%',

@@ -42,10 +42,11 @@ class UserSerializer(serializers.ModelSerializer):
 class AppointmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Appointment
-        fields = ['id', 'user', 'service', 'totalCost', 'date', 'time', 'duration', 'payment']
+        fields = ['id', 'user', 'service', 'totalCost', 'date', 'time', 'duration', 'payment', 'isComplete']
         extra_kwargs = {
             'totalCost': {'required': False},
-            'payment': {'required': False}
+            'payment': {'required': False},
+            'isComplete': {'required': False}
         }
 
 class ServiceSerializer(serializers.ModelSerializer):
