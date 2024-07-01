@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import UserModal from './modal-usuarios';
+import { apiUrl } from '../../util/apiUrl';
 
 export default function Usuarios() {
     const navigate = useNavigate();
@@ -44,7 +45,7 @@ export default function Usuarios() {
         }
 
 
-        const response = await fetch(`http://127.0.0.1:8000/user/${selectedUser.id}`, {
+        const response = await fetch(`${apiUrl}/user/${selectedUser.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -78,7 +79,7 @@ export default function Usuarios() {
     };
 
     const getUsers = async () => {
-        const response = await fetch(`http://127.0.0.1:8000/users`, {
+        const response = await fetch(`${apiUrl}/users`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json'

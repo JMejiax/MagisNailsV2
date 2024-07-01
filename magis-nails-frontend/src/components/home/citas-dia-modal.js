@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { Modal, Box, Paper, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 import AuthContext from '../../context/AuthContext';
+import { apiUrl } from '../../util/apiUrl';
 
 export default function DayModal({ open, handleClose, selectedDay, apps }) {
     const { userData } = useContext(AuthContext);
@@ -10,7 +11,7 @@ export default function DayModal({ open, handleClose, selectedDay, apps }) {
 
     const getServices = async () => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/services`, {
+            const response = await fetch(`${apiUrl}/services`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -28,7 +29,7 @@ export default function DayModal({ open, handleClose, selectedDay, apps }) {
 
     const getUsers = async () => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/users`, {
+            const response = await fetch(`${apiUrl}/users`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

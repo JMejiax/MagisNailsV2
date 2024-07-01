@@ -4,6 +4,7 @@ import {
     Paper, Button, Typography, Box, TablePagination
 } from '@mui/material';
 import ModalServicio from './modal-servicios';
+import { apiUrl } from '../../util/apiUrl';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -38,7 +39,7 @@ export default function Servicios() {
             formData.append('image', updatedService.image);
         }
 
-        const response = await fetch(`http://127.0.0.1:8000/service/${updatedService.id}`, {
+        const response = await fetch(`${apiUrl}/service/${updatedService.id}`, {
             method: 'PUT',
             body: formData
         }).catch(error => {
@@ -71,7 +72,7 @@ export default function Servicios() {
     };
 
     const getServices = async () => {
-        const response = await fetch(`http://127.0.0.1:8000/services`, {
+        const response = await fetch(`${apiUrl}/services`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json'

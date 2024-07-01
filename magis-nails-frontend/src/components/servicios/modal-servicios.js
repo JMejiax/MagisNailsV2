@@ -3,6 +3,8 @@ import {
     Modal, Box, TextField, Button, Typography, Switch, FormControlLabel
 } from '@mui/material';
 
+import { apiUrl } from '../../util/apiUrl';
+
 export default function ModalServicio({ open, handleClose, service, handleSave }) {
     const [name, setName] = useState(service.name);
     const [description, setDescription] = useState(service.description);
@@ -116,7 +118,7 @@ export default function ModalServicio({ open, handleClose, service, handleSave }
                 />
                 {image && (
                     <Box sx={{ textAlign: 'left', mt: 2 }}>
-                        <img src={`http://127.0.0.1:8000${image}`} alt="Service" style={{ maxHeight: 100, maxWidth: '100%' }} />
+                        <img src={`${apiUrl}${image}`} alt="Service" style={{ maxHeight: 100, maxWidth: '100%' }} />
                     </Box>
                 )}
                 <input

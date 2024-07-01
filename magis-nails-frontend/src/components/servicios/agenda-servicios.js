@@ -3,6 +3,7 @@ import { Box, Container, Grid, Card, CardMedia, CardContent, Typography, CardAct
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import ErrorIcon from '@mui/icons-material/Error'; // Icon for indicating no products available
 import { useNavigate } from "react-router-dom";
+import { apiUrl } from '../../util/apiUrl';
 
 export default function AgendaServicios() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ export default function AgendaServicios() {
 
   const checkServiceAvailability = async (serviceId) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/validate_service/${serviceId}/`);
+      const response = await fetch(`${apiUrl}/validate_service/${serviceId}/`);
       const data = await response.json();
       return data.available; // Return true or false based on availability
     } catch (error) {
@@ -28,7 +29,7 @@ export default function AgendaServicios() {
   }
 
   const getServices = async () => {
-    const response = await fetch(`http://127.0.0.1:8000/services`, {
+    const response = await fetch(`${apiUrl}/services`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -87,7 +88,7 @@ export default function AgendaServicios() {
               <CardMedia
                 component="img"
                 height="150"
-                image={`http://127.0.0.1:8000${service.image}`}
+                image={`${apiUrl}${service.image}`}
                 alt={service.name}
               />
               <CardContent>

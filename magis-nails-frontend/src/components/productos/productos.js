@@ -5,6 +5,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ProductModal from './modal-productos.js';
+import { apiUrl } from '../../util/apiUrl.js';
 
 export default function Productos() {
     const navigate = useNavigate();
@@ -53,7 +54,7 @@ export default function Productos() {
         console.log(formData)
 
         // Handle form submission
-        const response = await fetch(`http://127.0.0.1:8000/product/${id}`, {
+        const response = await fetch(`${apiUrl}/product/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -78,7 +79,7 @@ export default function Productos() {
     };
 
     const getProducts = async () => {
-        const response = await fetch(`http://127.0.0.1:8000/products`, {
+        const response = await fetch(`${apiUrl}/products`, {
             method: 'GET',
             headers: {
               'Content-Type': 'application/json'
@@ -97,7 +98,7 @@ export default function Productos() {
     }
 
     const getServices = async () => {
-        const response = await fetch(`http://127.0.0.1:8000/services`, {
+        const response = await fetch(`${apiUrl}/services`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Box, TextField, Typography, Button, Grid, FormControl, InputLabel, Select, MenuItem, FormHelperText, FormControlLabel, Checkbox } from '@mui/material';
 import dayjs from 'dayjs';
+import { apiUrl } from '../../util/apiUrl';
 
 const modalStyle = {
     position: 'absolute',
@@ -81,7 +82,7 @@ function EventModal({ open, handleClose, events, handleSave, isAdmin }) {
             .map(service => service.duration)
             .reduce((acc, duration) => acc + duration, 0);
         try {
-            const response = await fetch(`http://127.0.0.1:8000/availabletime/${date}?duration=${duration}`, {
+            const response = await fetch(`${apiUrl}/availabletime/${date}?duration=${duration}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

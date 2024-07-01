@@ -3,6 +3,7 @@ import { Grid, Container, Divider, Box, Typography } from '@mui/material';
 import Calendar from '../calendar/calendar';
 import UpcomingEventsTable from './proximas-citas-tbl';
 import AuthContext from '../../context/AuthContext';
+import { apiUrl } from '../../util/apiUrl';
 
 const months = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -19,7 +20,7 @@ export default function Home() {
   }
 
   const getApp = async () => {
-    const response = await fetch(`http://127.0.0.1:8000/appointment/${selectedDate.getFullYear()}/${selectedDate.getMonth()+1}`, {
+    const response = await fetch(`${apiUrl}/appointment/${selectedDate.getFullYear()}/${selectedDate.getMonth()+1}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'

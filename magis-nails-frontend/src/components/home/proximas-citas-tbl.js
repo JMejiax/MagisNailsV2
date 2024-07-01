@@ -13,6 +13,7 @@ import {
 import EventModal from './citas-modal';
 import dayjs from 'dayjs';
 import AuthContext from '../../context/AuthContext';
+import { apiUrl } from '../../util/apiUrl';
 
 export default function UpcomingEventsTable({ events, date, updateApp }) {
   const { userData } = React.useContext(AuthContext);
@@ -40,7 +41,7 @@ export default function UpcomingEventsTable({ events, date, updateApp }) {
   // Fetch services
   const getServices = async () => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/services`, {
+      const response = await fetch(`${apiUrl}/services`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -58,7 +59,7 @@ export default function UpcomingEventsTable({ events, date, updateApp }) {
   };
 
   const getUsers = async () => {
-    const response = await fetch(`http://127.0.0.1:8000/users`, {
+    const response = await fetch(`${apiUrl}/users`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
@@ -131,7 +132,7 @@ export default function UpcomingEventsTable({ events, date, updateApp }) {
 
 
 
-      const response = await fetch(`http://127.0.0.1:8000/appointment/${app.id}`, {
+      const response = await fetch(`${apiUrl}/appointment/${app.id}`, {
         method: 'PUT',
         body: formData,
       }).catch(error => {
@@ -160,7 +161,7 @@ export default function UpcomingEventsTable({ events, date, updateApp }) {
     if (!paymentUrl) {
       alert("No tiene imagen")
     } else {
-      window.open(`http://127.0.0.1:8000${paymentUrl}`, '_blank');
+      window.open(`${apiUrl}${paymentUrl}`, '_blank');
     }
   };
 

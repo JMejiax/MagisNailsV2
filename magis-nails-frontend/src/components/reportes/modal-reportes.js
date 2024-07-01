@@ -3,6 +3,7 @@ import { Modal, Box, TextField, Typography, FormControl, InputLabel, Select, Men
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import FetchReportData from './fetchReportData';
 import dayjs from 'dayjs';
+import { apiUrl } from '../../util/apiUrl';
 
 const ReportModal = ({ open, handleClose, report }) => {
     const [users, setUsers] = useState([]);
@@ -19,7 +20,7 @@ const ReportModal = ({ open, handleClose, report }) => {
 
     const getUsers = async () => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/users`, {
+            const response = await fetch(`${apiUrl}/users`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

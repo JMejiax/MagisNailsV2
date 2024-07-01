@@ -4,6 +4,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
+import { apiUrl } from '../../util/apiUrl';
+
 const style = {
   position: 'absolute',
   top: '50%',
@@ -49,7 +51,7 @@ export default function ResetForm({ open, handleClose }) {
 
     if (response.status === 200) {
       //If user is correct, change the password
-      const response = await fetch(`http://127.0.0.1:8000/user/${userData.id}`, {
+      const response = await fetch(`${apiUrl}/user/${userData.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

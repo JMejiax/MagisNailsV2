@@ -3,6 +3,7 @@ import { Modal, Box, Typography, TextField, Button, Avatar, IconButton, InputAdo
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { apiUrl } from '../../util/apiUrl';
 
 const style = {
   position: 'absolute',
@@ -70,7 +71,7 @@ export default function RegistroForm({ open, handleClose }) {
       return;
     }
 
-    const response = await fetch(`http://127.0.0.1:8000/users`, {
+    const response = await fetch(`${apiUrl}/users`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

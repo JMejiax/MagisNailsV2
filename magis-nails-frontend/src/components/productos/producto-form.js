@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Container, Box, TextField, FormControlLabel, Switch, Button, Typography, FormControl, InputLabel, Select, MenuItem, FormHelperText, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
+import { apiUrl } from '../../util/apiUrl';
+
 export default function ProductForm() {
     const navigate = useNavigate();
 
@@ -103,7 +105,7 @@ export default function ProductForm() {
         };
 
         // Handle form submission
-        const response = await fetch(`http://127.0.0.1:8000/products`, {
+        const response = await fetch(`${apiUrl}/products`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -128,7 +130,7 @@ export default function ProductForm() {
 
 
     const getServices = async () => {
-        const response = await fetch(`http://127.0.0.1:8000/services`, {
+        const response = await fetch(`${apiUrl}/services`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'

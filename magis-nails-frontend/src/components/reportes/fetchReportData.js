@@ -5,6 +5,7 @@ import ProductUsageReport from './ProductUsageReport';
 import UserAppointmentHistoryReport from './UserAppointmentHistoryReport';
 import ServiceAppointmentSummaryReport from './ServiceAppointmentSummaryReport';
 import RevenueReport from './RevenueReport';
+import { apiUrl } from '../../util/apiUrl';
 
 const FetchReportData = ({ report, startDate, endDate, selectedUser, userName }) => {
     const [reportData, setReportData] = useState([]);
@@ -27,22 +28,22 @@ const FetchReportData = ({ report, startDate, endDate, selectedUser, userName })
 
         switch (report.id) {
             case 1:
-                url = `http://127.0.0.1:8000/login_activity_report`;
+                url = `${apiUrl}/login_activity_report`;
                 break;
             case 2:
-                url = `http://127.0.0.1:8000/service_usage_report`;
+                url = `${apiUrl}/service_usage_report`;
                 break;
             case 3:
-                url = `http://127.0.0.1:8000/product_usage_report`;
+                url = `${apiUrl}/product_usage_report`;
                 break;
             case 4:
-                url = `http://127.0.0.1:8000/user_appointment_history_report/${selectedUser}`;
+                url = `${apiUrl}/user_appointment_history_report/${selectedUser}`;
                 break;
             case 5:
-                url = `http://127.0.0.1:8000/service_appointment_summary_report/${startDate}/${endDate}`;
+                url = `${apiUrl}/service_appointment_summary_report/${startDate}/${endDate}`;
                 break;
             case 6:
-                url = `http://127.0.0.1:8000/revenue_report/${startDate}/${endDate}`;
+                url = `${apiUrl}/revenue_report/${startDate}/${endDate}`;
                 break;
             default:
                 break;

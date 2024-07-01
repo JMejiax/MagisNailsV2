@@ -10,6 +10,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { styled } from '@mui/system';
 import AuthContext from '../../context/AuthContext';
 import _ from 'lodash';
+import { apiUrl } from '../../util/apiUrl';
 
 const Input = styled('input')({
   display: 'none',
@@ -112,7 +113,7 @@ export default function AgendaForm() {
       }
 
       try {
-        const response = await fetch(`http://127.0.0.1:8000/appointments`, {
+        const response = await fetch(`${apiUrl}/appointments`, {
           method: 'POST',
           body: formData
         });
@@ -142,7 +143,7 @@ export default function AgendaForm() {
     if (!success) {
       for (const id of appointmentIds) {
         try {
-          const deleteResponse = await fetch(`http://127.0.0.1:8000/appointment/${id}`, {
+          const deleteResponse = await fetch(`${apiUrl}/appointment/${id}`, {
             method: 'DELETE'
           });
           if (!deleteResponse.ok) {
@@ -164,7 +165,7 @@ export default function AgendaForm() {
     setLoadingServices(true);
     try {
       // console.log('Fetching services');
-      const response = await fetch(`http://127.0.0.1:8000/services`, {
+      const response = await fetch(`${apiUrl}/services`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -192,7 +193,7 @@ export default function AgendaForm() {
     setLoadingTimes(true);
     try {
       // console.log('Fetching available times');
-      const response = await fetch(`http://127.0.0.1:8000/availabletime/${date}?duration=${duration}`, {
+      const response = await fetch(`${apiUrl}/availabletime/${date}?duration=${duration}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -219,7 +220,7 @@ export default function AgendaForm() {
     if (!userData.isAdmin) {
       return;
     }
-    const response = await fetch(`http://127.0.0.1:8000/users`, {
+    const response = await fetch(`${apiUrl}/users`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'

@@ -5,6 +5,7 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../../context/AuthContext';
+import { apiUrl } from '../../util/apiUrl';
 
 export default function MiCuentaForm() {
     const navigate = useNavigate();
@@ -70,7 +71,7 @@ export default function MiCuentaForm() {
             newUserData.password = formValues.password;
         }
 
-        const response = await fetch(`http://127.0.0.1:8000/user/${userData.id}`, {
+        const response = await fetch(`${apiUrl}/user/${userData.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'

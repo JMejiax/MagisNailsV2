@@ -3,6 +3,8 @@ import { jwtDecode } from 'jwt-decode';
 
 import { useNavigate } from "react-router-dom";
 
+import { apiUrl } from "../util/apiUrl";
+
 const AuthContext = createContext()
 
 export default AuthContext;
@@ -25,7 +27,7 @@ export const AuthProvider = ({ children }) => {
 
     const loginUser = async (e) => {
         e.preventDefault();
-        const response = await fetch('http://127.0.0.1:8000/api/token/', {
+        const response = await fetch(`${apiUrl}/api/token/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -43,7 +45,7 @@ export const AuthProvider = ({ children }) => {
         if (response.status === 200) {
 
             // Get user id with the email
-            const userResponse = await fetch(`http://127.0.0.1:8000/users/email/?email=${e.target.email.value}`, {
+            const userResponse = await fetch(`${apiUrl}/users/email/?email=${e.target.email.value}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -98,7 +100,7 @@ export const AuthProvider = ({ children }) => {
     const updateToken = async () => {
 
         // console.log("Loading", loading)
-        const response = await fetch('http://127.0.0.1:8000/api/token/refresh/', {
+        const response = await fetch(`${apiUrl}/api/token/refresh/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -118,7 +120,7 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('authTokens', JSON.stringify(data));
 
             // Get user id with the email
-            const userResponse = await fetch(`http://127.0.0.1:8000/user/${userData.user_id}`, {
+            const userResponse = await fetch(`${apiUrl}/user/${userData.user_id}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

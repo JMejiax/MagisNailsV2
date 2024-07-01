@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Container, Box, TextField, FormControlLabel, Switch, Button, Typography, InputAdornment } from '@mui/material';
 import { styled } from '@mui/system';
 import { useNavigate } from 'react-router-dom';
+import { apiUrl } from '../../util/apiUrl';
 
 const Input = styled('input')({
     display: 'none',
@@ -87,7 +88,7 @@ export default function ServiciosForm() {
         formData.append('image', formValues.serviceImage);
         formData.append('isActive', formValues.isActive);
 
-        const response = await fetch(`http://127.0.0.1:8000/services`, {
+        const response = await fetch(`${apiUrl}/services`, {
             method: 'POST',
             body: formData
         }).catch(error => {
